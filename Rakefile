@@ -52,6 +52,9 @@ task :concat_js do
   
   # Lunr is stored separately so we can use it for index generation
   FileUtils.cp('bower_components/lunr.js/lunr.min.js', 'build/lunr.min.js')
+  FileUtils.cp('bower_components/lunr-languages/lunr.stemmer.support.js', 'build/lunr.stemmer.support.js')
+  FileUtils.cp('bower_components/lunr-languages/lunr.ru.js', 'build/lunr.ru.js')
+  
 end
 
 task :minify_js do

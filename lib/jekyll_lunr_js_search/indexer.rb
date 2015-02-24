@@ -20,7 +20,9 @@ module Jekyll
             'tags' => 20,
             'body' => 1
           },
-          'js_dir' => 'js'
+          'js_dir' => 'js',
+          'use_other_locale' => true,
+          'locale' => 'ru'
         }.merge!(config['lunr_search'] || {})
 
         @js_dir = lunr_config['js_dir']
@@ -30,8 +32,19 @@ module Jekyll
 
         ctx = V8::Context.new
         ctx.load(@lunr_path)
+        if(lunr_config['use_other_locale'])
+          ctx.load(File.join(File.dirname(__FILE__), "../../build/lunr.stemmer.support.js"))
+          ctx.load(File.join(File.dirname(__FILE__), "../../build/lunr.#{lunr_config['locale']}.js"))
+          lunrru = ctx.eval("lunr.#{lunr_config['locale']}")
+          @locale = lunr_config['locale']
+        end
+        
+        
         ctx['indexer'] = proc do |this|
           this.ref('id')
+          if(lunr_config['use_other_locale'])
+            this.use(lunrru)
+          end
           lunr_config['fields'].each_pair do |name, boost|
             this.field(name, { 'boost' => boost })
           end
@@ -91,13 +104,24 @@ module Jekyll
 
         filepath = File.join(site.dest, filename)
         File.open(filepath, "w") { |f| f.write(total.to_json(:max_nesting => 150)) }
-        Jekyll.logger.info "Lunr:", "Index ready (lunr.js v#{@lunr_version})"
+        Jekyll.logger.info "Lunr:", "Index ready (lunr.js v#{@lunr_version}) at #{filepath}"
         added_files = [filename]
 
         site_js = File.join(site.dest, @js_dir)
         # If we're using the gem, add the lunr and search JS files to the _site
         if File.expand_path(site_js) != File.dirname(@lunr_path)
           extras = Dir.glob(File.join(File.dirname(@lunr_path), "*.min.js"))
+          FileUtils.cp(extras, site_js)
+          extras.map! { |min| File.join(@js_dir, File.basename(min)) }
+          Jekyll.logger.debug "Lunr:", "Added JavaScript to #{@js_dir}"
+          added_files.push(*extras)
+        end
+
+        #Copy localized js if required
+        if (@locale != nil)
+          puts "all right! #{@lunr_path}"
+          puts File.join(File.dirname(@lunr_path), "lunr.*.js")
+          extras = Dir.glob(File.join(File.dirname(@lunr_path), "lunr.*.js"))
           FileUtils.cp(extras, site_js)
           extras.map! { |min| File.join(@js_dir, File.basename(min)) }
           Jekyll.logger.debug "Lunr:", "Added JavaScript to #{@js_dir}"
