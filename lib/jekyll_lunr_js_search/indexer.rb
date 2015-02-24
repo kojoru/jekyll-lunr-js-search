@@ -119,8 +119,6 @@ module Jekyll
 
         #Copy localized js if required
         if (@locale != nil)
-          puts "all right! #{@lunr_path}"
-          puts File.join(File.dirname(@lunr_path), "lunr.*.js")
           extras = Dir.glob(File.join(File.dirname(@lunr_path), "lunr.*.js"))
           FileUtils.cp(extras, site_js)
           extras.map! { |min| File.join(@js_dir, File.basename(min)) }
