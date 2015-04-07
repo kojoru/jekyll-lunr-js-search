@@ -113,7 +113,7 @@ module Jekyll
         }
 
         filepath = File.join(site.dest, filename)
-        File.open(filepath, "w") { |f| f.write(total.to_json(:max_nesting => 150)) }
+        File.open(filepath, "w") { |f| f.write(total.to_json(:max_nesting => 1500)) }
         Jekyll.logger.info "Lunr:", "Index ready (lunr.js v#{@lunr_version}) at #{filepath}"
         added_files = [filename]
 
@@ -129,8 +129,6 @@ module Jekyll
 
         #Copy localized js if required
         if (@locale != nil)
-          puts "all right! #{@lunr_path}"
-          puts File.join(File.dirname(@lunr_path), "lunr.*.js")
           extras = Dir.glob(File.join(File.dirname(@lunr_path), "lunr.*.js"))
           FileUtils.cp(extras, site_js)
           extras.map! { |min| File.join(@js_dir, File.basename(min)) }
@@ -266,6 +264,6 @@ class V8::Object
   end
 
   def to_hash
-    JSON.parse(to_json, :max_nesting => 150)
+    JSON.parse(to_json, :max_nesting => 1500)
   end
 end

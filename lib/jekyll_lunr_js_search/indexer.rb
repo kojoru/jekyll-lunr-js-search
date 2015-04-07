@@ -103,7 +103,7 @@ module Jekyll
         }
 
         filepath = File.join(site.dest, filename)
-        File.open(filepath, "w") { |f| f.write(total.to_json(:max_nesting => 150)) }
+        File.open(filepath, "w") { |f| f.write(total.to_json(:max_nesting => 1500)) }
         Jekyll.logger.info "Lunr:", "Index ready (lunr.js v#{@lunr_version}) at #{filepath}"
         added_files = [filename]
 
