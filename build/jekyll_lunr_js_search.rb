@@ -95,7 +95,8 @@ module Jekyll
             "url" => entry.url,
             "date" => entry.date,
             "categories" => entry.categories,
-            "body" => entry.body
+            "body" => entry.body,
+            "header" => entry.properties['header']
           }
           @index.add(doc)
           doc.delete("body")
@@ -198,7 +199,7 @@ module Jekyll
         title, url = extract_title_and_url(page_or_post)
         body = renderer.render(page_or_post)
 
-        SearchEntry.new(title, url, date, categories, body, renderer)
+        SearchEntry.new(title, url, date, categories, body, renderer, page_or_post.to_liquid)
       end
 
       def self.extract_title_and_url(item)
@@ -206,10 +207,10 @@ module Jekyll
         [ data['title'], data['url'] ]
       end
 
-      attr_reader :title, :url, :date, :categories, :body, :collection
+      attr_reader :title, :url, :date, :categories, :body, :collection, :properties
       
-      def initialize(title, url, date, categories, body, collection)
-        @title, @url, @date, @categories, @body, @collection = title, url, date, categories, body, collection
+      def initialize(title, url, date, categories, body, collection, properties)
+        @title, @url, @date, @categories, @body, @collection, @properties = title, url, date, categories, body, collection, properties
       end
       
       def strip_index_suffix_from_url!

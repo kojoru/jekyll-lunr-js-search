@@ -85,7 +85,8 @@ module Jekyll
             "url" => entry.url,
             "date" => entry.date,
             "categories" => entry.categories,
-            "body" => entry.body
+            "body" => entry.body,
+            "header" => entry.properties['header']
           }
           @index.add(doc)
           doc.delete("body")
